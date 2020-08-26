@@ -1,6 +1,8 @@
 # Regression with PyTorch
 # https://carpentries-incubator.github.io/deep-learning_intro/03-regression/index.html
 
+# increase the hidden layers
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -10,17 +12,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import pandas as pd
-
-# 64 samples
-N = 64
-# 1000 neurons in the input layer
-D_in = 1000
-# and 10 neurons in the output layer
-D_out = 10
-
-# Create random Tensors to hold inputs and outputs
-x = torch.randn(N, D_in)
-y = torch.randn(N, D_out)
 
 # ==============================================================================
 # define the neural network
@@ -46,21 +37,37 @@ class Model(torch.nn.Module):
         self.l1 = torch.nn.Linear(D_in, H)
 
         # hidden layer
-        self.relu = torch.nn.ReLU()
+        self.relu_1 = torch.nn.ReLU()
+
+        self.relu_2 = torch.nn.ReLU()
 
         # output layer
         self.l2=torch.nn.Linear(H, D_out)
 
     def forward(self, X):
-        return self.l2(self.relu(self.l1(X)))
+        
+        # return self.l2(self.relu_2(self.relu_1(self.l1(X))))
+        return self.l2(self.relu_1(self.l1(X)))
 
+# ==============================================================================
+# 64 samples
+N = 640
+# 1000 neurons in the input layer
+D_in = 1000
+# and 10 neurons in the output layer
+D_out = 10
 
-# in hidden layer, define 100 neurons
+# Create random Tensors to hold inputs and outputs
+x = torch.randn(N, D_in)
+y = torch.randn(N, D_out)
+
+# in hidden layer, define H neurons
 H = 100
 
 model = Model(D_in, H, D_out)
 
-loss_fn = torch.nn.MSELoss(reduction = 'sum')
+# loss_fn = torch.nn.MSELoss(reduction = 'sum')
+loss_fn = torch.nn.MSELoss()
 # TODO: understand 'reduction
 
 # an Optimizer will update the weights of the model
@@ -68,11 +75,11 @@ loss_fn = torch.nn.MSELoss(reduction = 'sum')
 # optimizer which Tensors it should update.
 
 # learning rate influences the accuracy
-learning_rate = 1e-2
+learning_rate = 1e-4
 
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-for t in range(500):
+for t in range(5000):
 
         
     # Before the backward pass, use the optimizer object to zero all of the
@@ -97,6 +104,9 @@ for t in range(500):
     # parameters
     optimizer.step()
 
+    if loss < 1e-5:
+        break
+
 y_last = model(x)
 print(y_last - y)
 
@@ -106,5 +116,5 @@ plt.figure(figsize=(5,5))
 plt.plot(y.detach().numpy(), y_last.detach().numpy(), 'o')
 plt.xlabel('Targeted y', fontsize=16)
 plt.ylabel('Modeled y', fontsize=16)
-plt.savefig('./model-validation-tutorial-4.jpg',dpi=300)
+plt.savefig('./model-validation-tutorial-4-1.jpg',dpi=300)
 
