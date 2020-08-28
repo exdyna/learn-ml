@@ -52,7 +52,7 @@ optimizer = torch.optim.Adam(net.parameters(), lr=1.0e-2)
 loss_func = torch.nn.MSELoss()  
 
 # Step-4: define input and out put
-BATCH_SIZE = 64
+BATCH_SIZE = 10
 EPOCH = 200
 
 torch_dataset = Data.TensorDataset(x, y)
