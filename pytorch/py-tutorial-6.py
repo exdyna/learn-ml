@@ -1,6 +1,7 @@
 # Split traning data to train and test sets
 # https://carpentries-incubator.github.io/deep-learning_intro/04-ann/index.html
 
+# TODO: this code is not successful can not predic using trained ann.
 import torch
 from torch.autograd import Variable
 import torch.nn.functional as F
@@ -16,8 +17,8 @@ torch.manual_seed(1)    # reproducible
 
 # x data (tensor), shape=(100, 1)
 # x = torch.unsqueeze(torch.linspace(-10, 10, 1000), dim=1)  
-x_size = 64
-x = torch.rand(100,x_size)*10-5
+x_size = 5
+x = torch.rand(5,x_size)*10-5
 x,ind = torch.sort(x)
 print(x.size())
 
@@ -91,7 +92,7 @@ loss_func = torch.nn.MSELoss()
 
 # Step-4: define input and out put
 BATCH_SIZE = 10
-EPOCH = 200
+EPOCH = 1
 training_convergence = 1e-2
 
 torch_dataset = Data.TensorDataset(x, y)
@@ -103,7 +104,9 @@ torch_dataset = Data.TensorDataset(x, y)
 loader = Data.DataLoader(
     dataset=torch_dataset, 
     batch_size=BATCH_SIZE, 
-    shuffle=True, num_workers=2,)
+    shuffle=True, num_workers=1,)
+
+
 # this loader will load the data with the number of batch_size from dataset randomly
 # in this case the loader will pick up 64 data each time for 15 times, and the rest 40 data  
 
@@ -123,11 +126,14 @@ fig, ax = plt.subplots(figsize=(16,10))
 for epoch in range(EPOCH):
 
     for step, (batch_x, batch_y) in enumerate(loader): 
+
+        print(batch_x)
         
         b_x = Variable(batch_x)
         b_y = Variable(batch_y)
         # each time pick up 64 data, and the last time pick up the rest 40 data
         
+        print(b_x)
         # calculate the prediction
         prediction = net(b_x)
 
@@ -192,7 +198,6 @@ ax.scatter(x.data.numpy(), y.data.numpy(), color = "blue", alpha=0.8)
 prediction = net(x) 
 ax.scatter(x.data.numpy(), prediction.data.numpy(), color='red', alpha=0.5)
 
-# ! if the model is trained using randomly distributed data, the prediciton only works for the randomly distributed data
 x = torch.rand(1,x_size)*10-5
 x.ind = torch.sort(x)
 prediction = net(x) 
