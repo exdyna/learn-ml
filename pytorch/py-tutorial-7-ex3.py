@@ -1,5 +1,4 @@
-# try to find the polynomial coefficients
-# y = a2*x^2 + a1*x^1 + a0
+# try to find the coefficients for 5th order polynomials
 # given data set of (y,a)
 import torch
 
@@ -167,14 +166,14 @@ np.random.seed(1)
 # number of  samples
 n_samples = 50
 # number of features for each sample
-n_in = 5
+n_in = 100
 
 # number of ouptput: n_out = n + 1 for n-th order polynomial
-n_out = 2
+n_out = 6
 
 # lower and upper bound for x in polynomial function y=f(x)
-x_lb = -2
-x_ub = 2
+x_lb = -10
+x_ub = 10
 
 # bound of polynomial coefficients
 p_lb = -1
@@ -224,10 +223,11 @@ test_loader = torch.utils.data.DataLoader(train_dataset,batch_size=batch_size_te
 print(train_loader.dataset)
 # ==============================================================================
 # define the neural network
+
 model = torch.nn.Sequential(
-        torch.nn.Linear(n_in, 10),
-        torch.nn.LeakyReLU(),        
-        torch.nn.Linear(10, n_out)
+        torch.nn.Linear(n_in, 500),
+        torch.nn.LogSoftmax(),
+        torch.nn.Linear(500, n_out)
     )
 
 learning_rate = 1e-2
@@ -236,7 +236,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,mode='min')
 
 # start training
-loss_train, loss_test = training_loop(n_epochs=10000, 
+loss_train, loss_test = training_loop(n_epochs=2000, 
     optimizer = optimizer,
     loss_fn = loss_fn,
     model = model, 
